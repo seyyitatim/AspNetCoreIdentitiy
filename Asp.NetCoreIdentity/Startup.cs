@@ -1,7 +1,9 @@
+﻿using Asp.NetCoreIdentity.CustomValidations;
 using Asp.NetCoreIdentity.Data;
 using Asp.NetCoreIdentity.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +34,38 @@ namespace Asp.NetCoreIdentity
                 opt.UseSqlServer(Configuration["ConnectionStrings:Default"]);
             });
 
-            services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+            CookieBuilder cookieBuilder = new CookieBuilder();
+            cookieBuilder.Name = "MyBlog";
+            cookieBuilder.HttpOnly = false;
+            cookieBuilder.Expiration = System.TimeSpan.FromDays(1); // Geçerlilik süresi
+            cookieBuilder.SameSite = SameSiteMode.Strict;
+            cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
+            services.ConfigureApplicationCookie(opt =>
+            {
+                opt.LoginPath = new PathString("/Home/Login");
+                opt.Cookie = cookieBuilder;
+                opt.SlidingExpiration = true;//geçerlilik süresini yarısına gelince, bir sonraki istekte süreyi uzatır.
+            });
+
+
+
+
+            services.AddIdentity<AppUser, AppRole>(opt =>
+            {
+                opt.Password.RequiredLength = 4; // şifre uzunluğu
+                opt.Password.RequireNonAlphanumeric = false; // (*,. vb.) karakterler zorunlu mu
+                opt.Password.RequireLowercase = false; // küçük harf zorunlu mu
+                opt.Password.RequireUppercase = false; // büyük harf zorunlu mu
+                opt.Password.RequireDigit = false; // sayı zorunlu mu
+
+                opt.User.RequireUniqueEmail = true; // email adresi tek olması
+                opt.User.AllowedUserNameCharacters = "abcçdefghıijklmnoöpqrsştuüvwxyzABCÇDEFGHIİJKLMNOPQRSŞTUÜVWXYZ0123456789-._"; // izin verilen karakterler
+            })
+                .AddPasswordValidator<CustomPasswordValidator>()
+                .AddUserValidator<CustomUserValidator>()
+                .AddErrorDescriber<CustomIdentityErrorDescriber>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddControllersWithViews();
         }
