@@ -1,5 +1,5 @@
 using Asp.NetCoreIdentity.Data;
-using Asp.NetCoreIdentity.Models;
+using Asp.NetCoreIdentity.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,7 +32,7 @@ namespace Asp.NetCoreIdentity
                 opt.UseSqlServer(Configuration["ConnectionStrings:Default"]);
             });
 
-            services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddControllersWithViews();
         }

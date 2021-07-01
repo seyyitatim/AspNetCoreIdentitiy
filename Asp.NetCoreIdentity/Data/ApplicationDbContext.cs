@@ -1,4 +1,4 @@
-﻿using Asp.NetCoreIdentity.Models;
+﻿using Asp.NetCoreIdentity.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Asp.NetCoreIdentity.Data
 {
-    public class ApplicationDbContext:IdentityDbContext<AppUser>
+    public class ApplicationDbContext:IdentityDbContext<AppUser,AppRole,string>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options)
         {

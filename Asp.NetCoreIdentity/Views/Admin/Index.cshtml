@@ -1,0 +1,32 @@
+﻿@model UserListDto
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<table class="table table-bordered table-striped">
+    <tr>
+        <td>User Id</td>
+        <td>User Name</td>
+        <td>Email</td>
+    </tr>
+
+    @if (Model.Users.Count > 0)
+    {
+        @foreach (var user in Model.Users)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="3">Hiç bir üye yoktur.</td>
+        </tr>
+    }
+</table>
+

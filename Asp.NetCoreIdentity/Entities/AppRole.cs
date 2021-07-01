@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Asp.NetCoreIdentity.Models
+namespace Asp.NetCoreIdentity.Entities
 {
-    public class AppUser : IdentityUser
+    public class AppRole:IdentityRole
     {
     }
 }
