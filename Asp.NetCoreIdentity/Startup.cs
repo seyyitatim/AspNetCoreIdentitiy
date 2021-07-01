@@ -34,23 +34,6 @@ namespace Asp.NetCoreIdentity
                 opt.UseSqlServer(Configuration["ConnectionStrings:Default"]);
             });
 
-            CookieBuilder cookieBuilder = new CookieBuilder();
-            cookieBuilder.Name = "MyBlog";
-            cookieBuilder.HttpOnly = false;
-            cookieBuilder.Expiration = System.TimeSpan.FromDays(1); // Geçerlilik süresi
-            cookieBuilder.SameSite = SameSiteMode.Strict;
-            cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-
-            services.ConfigureApplicationCookie(opt =>
-            {
-                opt.LoginPath = new PathString("/Home/Login");
-                opt.Cookie = cookieBuilder;
-                opt.SlidingExpiration = true;//geçerlilik süresini yarısına gelince, bir sonraki istekte süreyi uzatır.
-            });
-
-
-
-
             services.AddIdentity<AppUser, AppRole>(opt =>
             {
                 opt.Password.RequiredLength = 4; // şifre uzunluğu
@@ -66,6 +49,17 @@ namespace Asp.NetCoreIdentity
                 .AddUserValidator<CustomUserValidator>()
                 .AddErrorDescriber<CustomIdentityErrorDescriber>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.ConfigureApplicationCookie(opt =>
+            {
+                opt.Cookie.Name = "MyBlog";
+                opt.Cookie.HttpOnly = false;
+                opt.Cookie.SameSite = SameSiteMode.Strict;
+                opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                opt.ExpireTimeSpan = TimeSpan.FromDays(2);
+                opt.LoginPath = new PathString("/Home/Login");
+                opt.SlidingExpiration = true;//geçerlilik süresini yarısına gelince, bir sonraki istekte süreyi uzatır.
+            });
 
             services.AddControllersWithViews();
         }
