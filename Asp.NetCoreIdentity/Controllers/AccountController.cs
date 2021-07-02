@@ -26,8 +26,9 @@ namespace Asp.NetCoreIdentity.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Login(string returnUrl)
         {
+            TempData["ReturnUrl"] = returnUrl;
             return View();
         }
         [HttpPost]
@@ -39,17 +40,43 @@ namespace Asp.NetCoreIdentity.Controllers
 
                 if (user != null)
                 {
+                    if (await userManager.IsLockedOutAsync(user))
+                    {
+                        ModelState.AddModelError("", "Hesabınızı geçici olarak kitlenmiştir. Daha sonra tekrar deneyiniz");
+                        return View(model);
+                    }
+
+
                     await signInManager.SignOutAsync();
 
-                    Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
+                    Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
 
                     if (result.Succeeded)
                     {
+                        await userManager.ResetAccessFailedCountAsync(user);
+
+                        if (TempData["ReturnUrl"] != null)
+                        {
+                            return Redirect(TempData["ReturnUrl"].ToString());
+                        }
+
                         return RedirectToAction("Index", "Member");
                     }
                     else
                     {
-                        ModelState.AddModelError("", "Geçersiz kullanıcı adı ve şifresi");
+                        await userManager.AccessFailedAsync(user);
+
+                        int fall = await userManager.GetAccessFailedCountAsync(user);
+                        if (fall == 3)
+                        {
+                            await userManager.SetLockoutEndDateAsync(user, new DateTimeOffset(DateTime.Now.AddMinutes(20)));
+                            ModelState.AddModelError("", "Hesabınız 3 başarısız girişten dolayı 20 dakikalığına kitlenmiştir. Lütfen daha sonra tekrar deneyiniz.");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("", "Geçersiz kullanıcı adı ve şifresi");
+                            ModelState.AddModelError("", $"{fall} başarısız giriş");
+                        }
                     }
                 }
                 else
@@ -65,6 +92,7 @@ namespace Asp.NetCoreIdentity.Controllers
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> SingUp(UserViewModel model)
         {
@@ -92,5 +120,6 @@ namespace Asp.NetCoreIdentity.Controllers
             }
             return View(model);
         }
+
     }
 }

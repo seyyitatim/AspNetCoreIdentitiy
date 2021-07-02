@@ -45,10 +45,10 @@ namespace Asp.NetCoreIdentity
                 opt.User.RequireUniqueEmail = true; // email adresi tek olması
                 opt.User.AllowedUserNameCharacters = "abcçdefghıijklmnoöpqrsştuüvwxyzABCÇDEFGHIİJKLMNOPQRSŞTUÜVWXYZ0123456789-._"; // izin verilen karakterler
             })
-                .AddPasswordValidator<CustomPasswordValidator>()
-                .AddUserValidator<CustomUserValidator>()
-                .AddErrorDescriber<CustomIdentityErrorDescriber>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddPasswordValidator<CustomPasswordValidator>()
+            .AddUserValidator<CustomUserValidator>()
+            .AddErrorDescriber<CustomIdentityErrorDescriber>()
+            .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.ConfigureApplicationCookie(opt =>
             {
@@ -56,8 +56,8 @@ namespace Asp.NetCoreIdentity
                 opt.Cookie.HttpOnly = false;
                 opt.Cookie.SameSite = SameSiteMode.Strict;
                 opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-                opt.ExpireTimeSpan = TimeSpan.FromDays(2);
-                opt.LoginPath = new PathString("/Home/Login");
+                opt.ExpireTimeSpan = System.TimeSpan.FromDays(2);
+                opt.LoginPath = new PathString("/Account/Login");
                 opt.SlidingExpiration = true;//geçerlilik süresini yarısına gelince, bir sonraki istekte süreyi uzatır.
             });
 

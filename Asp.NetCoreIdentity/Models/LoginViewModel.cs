@@ -17,5 +17,7 @@ namespace Asp.NetCoreIdentity.Models
         [DataType(DataType.Password)]
         [MinLength(4,ErrorMessage ="Şifreniz en az 4 karakterli olmalıdır.")]
         public string Password { get; set; }
+        [Display(Name = "Beni Hatırla")]
+        public bool RememberMe { get; set; }
     }
 }
