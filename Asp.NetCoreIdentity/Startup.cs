@@ -45,6 +45,7 @@ namespace Asp.NetCoreIdentity
                 opt.User.RequireUniqueEmail = true; // email adresi tek olması
                 opt.User.AllowedUserNameCharacters = "abcçdefghıijklmnoöpqrsştuüvwxyzABCÇDEFGHIİJKLMNOPQRSŞTUÜVWXYZ0123456789-._"; // izin verilen karakterler
             })
+            .AddDefaultTokenProviders()
             .AddPasswordValidator<CustomPasswordValidator>()
             .AddUserValidator<CustomUserValidator>()
             .AddErrorDescriber<CustomIdentityErrorDescriber>()

@@ -1,4 +1,5 @@
 ﻿using Asp.NetCoreIdentity.Entities;
+using Asp.NetCoreIdentity.Helper;
 using Asp.NetCoreIdentity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -121,5 +122,81 @@ namespace Asp.NetCoreIdentity.Controllers
             return View(model);
         }
 
+        public IActionResult ResetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(PasswordResetViewModel model)
+        {
+
+            AppUser user = await userManager.FindByEmailAsync(model.Email);
+
+            if (user != null)
+            {
+                string passwordResetToken = await userManager.GeneratePasswordResetTokenAsync(user);
+
+                string passwordResetLink = Url.Action("ResetPasswordConfirm", "Account", new
+                {
+                    userId = user.Id,
+                    token = passwordResetToken
+                }, HttpContext.Request.Scheme);
+
+                PasswordReset.PasswordResetSendEmail(passwordResetLink);
+
+                ViewBag.status = "success";
+            }
+            else
+            {
+                ModelState.AddModelError("", "Sistemde kayıtlı email adresi bulunamamıştır");
+            }
+
+            return View(model);
+        }
+
+        public IActionResult ResetPasswordConfirm(string userId,string token)
+        {
+            TempData["userId"] = userId;
+            TempData["token"] = token;
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPasswordConfirm(NewPasswordViewModel model)
+        {
+            string token = TempData["token"].ToString();
+            string userId = TempData["userId"].ToString();
+
+            var user = await userManager.FindByIdAsync(userId);
+
+            if (user!=null)
+            {
+                IdentityResult result = await userManager.ResetPasswordAsync(user, token, model.Password);
+
+                if (result.Succeeded)
+                {
+                    await userManager.UpdateSecurityStampAsync(user);
+
+                    TempData["passwordResetInfo"] = "Şifreni başarıyla yenilenmiştir.";
+
+                    ViewBag.status = "success";
+                }
+                else
+                {
+                    foreach (var item in result.Errors)
+                    {
+                        ModelState.AddModelError("", item.Description);
+                    }
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Hata meydana gelmiştir. Lütfen daha sonra tekrar deneyiniz.");
+            }
+
+            return View();
+        }
     }
 }
