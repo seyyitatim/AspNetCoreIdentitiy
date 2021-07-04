@@ -9,13 +9,10 @@ using System.Threading.Tasks;
 
 namespace Asp.NetCoreIdentity.Controllers
 {
-    public class AdminController : Controller
+    public class AdminController : BaseController
     {
-        private readonly UserManager<AppUser> userManager;
-
-        public AdminController(UserManager<AppUser> userManager)
+        public AdminController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager) : base(userManager, signInManager)
         {
-            this.userManager = userManager;
         }
         public IActionResult Index()
         {

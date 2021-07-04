@@ -10,15 +10,10 @@ using System.Threading.Tasks;
 
 namespace Asp.NetCoreIdentity.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
-        private readonly UserManager<AppUser> userManager;
-        private readonly SignInManager<AppUser> signInManager;
-
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager):base(userManager,signInManager)
         {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
         }
 
         public IActionResult Index()
@@ -113,10 +108,7 @@ namespace Asp.NetCoreIdentity.Controllers
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
+                    AddModelError(result);
                 }
             }
             return View(model);
@@ -185,10 +177,7 @@ namespace Asp.NetCoreIdentity.Controllers
                 }
                 else
                 {
-                    foreach (var item in result.Errors)
-                    {
-                        ModelState.AddModelError("", item.Description);
-                    }
+                    AddModelError(result);
                 }
             }
             else

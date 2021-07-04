@@ -1,31 +1,29 @@
 ﻿using Asp.NetCoreIdentity.Entities;
+using Asp.NetCoreIdentity.Enums;
 using Asp.NetCoreIdentity.Models;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Asp.NetCoreIdentity.Controllers
 {
     [Authorize]
-    public class MemberController : Controller
+    public class MemberController : BaseController
     {
-        private readonly UserManager<AppUser> userManager;
-        private readonly SignInManager<AppUser> signInManager;
-
-        public MemberController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        public MemberController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager) : base(userManager, signInManager)
         {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
         }
 
         public IActionResult Index()
         {
-            var user = userManager.FindByNameAsync(User.Identity.Name).Result;
+            var user = CurrentUser;
 
             UserViewModel userModel = user.Adapt<UserViewModel>();
 
@@ -42,7 +40,7 @@ namespace Asp.NetCoreIdentity.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = userManager.FindByNameAsync(User.Identity.Name).Result;
+                var user = CurrentUser;
 
                 if (user != null)
                 {
@@ -63,10 +61,7 @@ namespace Asp.NetCoreIdentity.Controllers
                         }
                         else
                         {
-                            foreach (var error in result.Errors)
-                            {
-                                ModelState.AddModelError("", error.Description);
-                            }
+                            AddModelError(result);
                         }
                     }
                     else
@@ -81,22 +76,45 @@ namespace Asp.NetCoreIdentity.Controllers
 
         public IActionResult Edit()
         {
-            var user = userManager.FindByNameAsync(User.Identity.Name).Result;
+            var user = CurrentUser;
 
             var userModel = user.Adapt<UserEditViewModel>();
+
+            ViewBag.Gender = new SelectList(Enum.GetNames(typeof(Gender)));
+
 
             return View(userModel);
         }
         [HttpPost]
         public async Task<IActionResult> Edit(UserEditViewModel model)
         {
+            ViewBag.Gender = new SelectList(Enum.GetNames(typeof(Gender)));
             if (ModelState.IsValid)
             {
-                var user = userManager.FindByNameAsync(User.Identity.Name).Result;
+                var user = CurrentUser;
+
+                if (model.Image != null && model.Image.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Image.FileName);
+
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/user", fileName);
+
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await model.Image.CopyToAsync(stream);
+
+                        user.Picture = "/images/user/" + fileName;
+                    }
+                }
+
+
 
                 user.UserName = model.UserName;
                 user.Email = model.Email;
                 user.PhoneNumber = model.PhoneNumber;
+                user.City = model.City;
+                user.BirthDay = model.BirthDay;
+                user.Gender = (int)model.Gender;
 
                 var result = await userManager.UpdateAsync(user);
 
@@ -111,10 +129,7 @@ namespace Asp.NetCoreIdentity.Controllers
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
+                    AddModelError(result);
                 }
             }
             return View(model);

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Asp.NetCoreIdentity.Enums;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -18,5 +20,14 @@ namespace Asp.NetCoreIdentity.Models
         [Display(Name = "E-Posta")]
         [EmailAddress(ErrorMessage = "{0} adresini doğru formatta giriniz")]
         public string Email { get; set; }
+        [DataType(DataType.Date)]
+        [Display(Name = "Doğum Tarihi")]
+        public DateTime? BirthDay { get; set; }
+        [Display(Name = "Resim")]
+        public IFormFile Image { get; set; }
+        [Display(Name = "Şehir")]
+        public string City { get; set; }
+        [Display(Name = "Cinsiyet")]
+        public Gender Gender { get; set; }
     }
 }
