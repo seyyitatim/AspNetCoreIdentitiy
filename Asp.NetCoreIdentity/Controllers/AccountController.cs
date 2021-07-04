@@ -198,5 +198,12 @@ namespace Asp.NetCoreIdentity.Controllers
 
             return View();
         }
+
+        public IActionResult Logout()
+        {
+            signInManager.SignOutAsync();
+
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

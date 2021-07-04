@@ -59,6 +59,7 @@ namespace Asp.NetCoreIdentity
                 opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 opt.ExpireTimeSpan = System.TimeSpan.FromDays(2);
                 opt.LoginPath = new PathString("/Account/Login");
+                //opt.LogoutPath = new PathString("/Account/Logout");
                 opt.SlidingExpiration = true;//geçerlilik süresini yarısına gelince, bir sonraki istekte süreyi uzatır.
             });
 
