@@ -359,5 +359,8 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
+# Images
+Asp.NetCoreIdentity/wwwroot/images/user
+
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
