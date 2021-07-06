@@ -194,5 +194,10 @@ namespace Asp.NetCoreIdentity.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }

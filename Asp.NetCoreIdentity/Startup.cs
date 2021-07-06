@@ -61,6 +61,7 @@ namespace Asp.NetCoreIdentity
                 opt.LoginPath = new PathString("/Account/Login");
                 //opt.LogoutPath = new PathString("/Account/Logout");
                 opt.SlidingExpiration = true;//geçerlilik süresini yarısına gelince, bir sonraki istekte süreyi uzatır.
+                opt.AccessDeniedPath = new PathString("/Member/AccessDenied");
             });
 
             services.AddControllersWithViews();

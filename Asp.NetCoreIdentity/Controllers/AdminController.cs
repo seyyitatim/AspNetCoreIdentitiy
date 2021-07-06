@@ -21,5 +21,14 @@ namespace Asp.NetCoreIdentity.Controllers
                 Users = userManager.Users.ToList()
             });
         }
+        public IActionResult Users()
+        {
+            var users = userManager.Users.ToList();
+            UserListDto model = new UserListDto()
+            {
+                Users = users
+            };
+            return View(model);
+        }
     }
 }
