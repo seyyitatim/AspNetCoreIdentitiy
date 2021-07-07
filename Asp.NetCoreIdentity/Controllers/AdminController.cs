@@ -12,7 +12,7 @@ namespace Asp.NetCoreIdentity.Controllers
 {
     public class AdminController : BaseController
     {
-        public AdminController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,RoleManager<AppRole> roleManager) : base(userManager, signInManager, roleManager)
+        public AdminController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, RoleManager<AppRole> roleManager) : base(userManager, signInManager, roleManager)
         {
         }
         public IActionResult Index()
@@ -43,7 +43,7 @@ namespace Asp.NetCoreIdentity.Controllers
         {
             var role = roleManager.FindByIdAsync(id).Result;
 
-            if (role!=null)
+            if (role != null)
             {
                 var result = roleManager.DeleteAsync(role).Result;
             }
@@ -68,13 +68,13 @@ namespace Asp.NetCoreIdentity.Controllers
                 return RedirectToAction("Roles");
             }
             AddModelError(result);
-            
+
             return View(model);
         }
         public IActionResult RoleEdit(string id)
         {
             var role = roleManager.FindByIdAsync(id).Result;
-            if (role==null)
+            if (role == null)
             {
                 return RedirectToAction("Roles");
             }
@@ -105,6 +105,58 @@ namespace Asp.NetCoreIdentity.Controllers
             }
             ModelState.AddModelError("", "Güncelleme işlemi başarısız oldu.");
             return RedirectToAction("Roles");
+        }
+
+        public IActionResult RoleAssign(string id)
+        {
+            TempData["userId"] = id;
+            var user = userManager.FindByIdAsync(id).Result;
+
+            ViewBag.username = user.UserName;
+
+            var roles = roleManager.Roles.ToList();
+
+            var userRoles = userManager.GetRolesAsync(user).Result;
+
+            List<RoleAssignViewModel> roleAssignViewModels = new List<RoleAssignViewModel>();
+
+            foreach (var role in roles)
+            {
+                var roleAssignViewModel = new RoleAssignViewModel()
+                {
+                    RoleId = role.Id,
+                    RoleName = role.Name
+                };
+                if (userRoles.Contains(role.Name))
+                {
+                    roleAssignViewModel.Exist = true;
+                }
+                else
+                {
+                    roleAssignViewModel.Exist = false;
+                }
+                roleAssignViewModels.Add(roleAssignViewModel);
+            }
+
+            return View(roleAssignViewModels);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RoleAssign(List<RoleAssignViewModel> model)
+        {
+            var user = userManager.FindByIdAsync(TempData["userId"].ToString()).Result;
+            foreach (var role in model)
+            {
+                if (role.Exist)
+                {
+                    await userManager.AddToRoleAsync(user, role.RoleName);
+                }
+                else
+                {
+                    await userManager.RemoveFromRoleAsync(user, role.RoleName);
+                }
+            }
+            return RedirectToAction("Users");
         }
     }
 }
