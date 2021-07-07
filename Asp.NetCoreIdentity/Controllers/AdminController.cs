@@ -1,6 +1,7 @@
 ﻿using Asp.NetCoreIdentity.Entities;
 using Asp.NetCoreIdentity.Models;
 using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Asp.NetCoreIdentity.Controllers
 {
+    [Authorize(Roles ="Admin")]
     public class AdminController : BaseController
     {
         public AdminController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, RoleManager<AppRole> roleManager) : base(userManager, signInManager, roleManager)

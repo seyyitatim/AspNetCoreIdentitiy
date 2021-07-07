@@ -135,5 +135,38 @@ namespace Asp.NetCoreIdentity.Controllers
             return View(model);
         }
 
+        [Authorize(Roles ="Editor")]
+        public IActionResult Editor()
+        {
+            return View();
+        }
+
+        [Authorize(Roles = "Manager")]
+        public IActionResult Manager()
+        {
+            return View();
+        }
+
+        public IActionResult AccessDenied(string ReturnUrl)
+        {
+            if (ReturnUrl.ToLower().Contains("violencegage"))
+            {
+                ViewBag.message = "Erişmeye çalıştığınız sayfa şiddet videoları içerdiğinden dolayı 15 yaşında büyük olmanız gerekmektedir";
+            }
+            else if (ReturnUrl.ToLower().Contains("ankarapage"))
+            {
+                ViewBag.message = "Bu sayfaya sadece şehir alanı ankara olan kullanıcılar erişebilir";
+            }
+            else if (ReturnUrl.ToLower().Contains("exchange"))
+            {
+                ViewBag.message = "30 günlük ücretsiz deneme hakkınız sona ermiştir.";
+            }
+            else
+            {
+                ViewBag.message = "Bu sayfaya erişim izniniz yoktur. Erişim izni almak için site yöneticisiyle görüşünüz";
+            }
+
+            return View();
+        }
     }
 }
