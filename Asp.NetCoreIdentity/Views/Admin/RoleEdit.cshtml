@@ -1,0 +1,32 @@
+﻿@model Asp.NetCoreIdentity.Models.RoleEditViewModel
+
+@{
+    ViewData["Title"] = "RoleEdit";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@if (ViewBag.success==true)
+{
+    <div class="alert alert-success">
+        Role başarılı bir şekilde güncellendi.
+    </div>
+}
+<h4>Rol Güncelleme</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="RoleEdit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" asp-for="Id" class="form-control" />
+
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Güncelle" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
